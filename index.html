@@ -44,26 +44,37 @@
             background: #f4f6f9;
         }
 
-        /* আপনার দেওয়া অফিশিয়াল স্ক্রিনশটের মতো টপ হেডার বার */
-        .top-bar {
-            background: #006643; /* অফিশিয়াল সৌদি চেম্বার গ্রিন কালার */
-            color: white;
-            padding: 12px 20px;
+        /* আপনার ছবি অনুযায়ী তৈরি করা পিওর সিএসএস গ্রেডিয়েন্ট টপ বার */
+        .top-gradient-bar {
+            background: linear-gradient(to right, #00965e 0%, #007c89 40%, #2e519b 75%, #3d5ba9 100%);
+            height: 65px;
+            width: 100%;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end; /* সব কনটেন্ট ডান পাশে নিয়ে যাবে */
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            height: 60px;
+            padding: 0 25px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.25);
         }
 
-        .top-bar .title-ar { font-size: 18px; font-weight: bold; }
-        .top-bar .title-en { font-size: 12px; opacity: 0.9; text-align: right; }
+        /* ডান পাশের লোগো এরিয়া */
+        .top-gradient-bar .right-logo {
+            height: 50px; /* বারের ভেতর লোগোটি যাতে পারফেক্ট দেখায় */
+            width: auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .top-gradient-bar .right-logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+        }
 
         /* একই ট্যাবে ফুল স্ক্রিন পিডিএফ ভিউয়ার */
         .pdf-viewer-container {
             flex: 1;
             width: 100%;
-            height: calc(100vh - 60px);
+            height: calc(100vh - 65px);
             background: #525659;
         }
 
@@ -101,9 +112,10 @@
     </div>
 
     <div id="mainPortal">
-        <div class="top-bar">
-            <div class="title-ar">الـغـرفـة الـتـجـاريـة - بـوابـة الـمـلـفـات</div>
-            <div class="title-en">Chamber of Commerce<br>Official Files Portal</div>
+        <div class="top-gradient-bar">
+            <div class="right-logo">
+                <img src="header-logo.png" alt="Chamber Right Logo">
+            </div>
         </div>
         <div class="pdf-viewer-container">
             <iframe id="pdfFrame" src=""></iframe>
@@ -149,20 +161,14 @@
                 return;
             }
 
-            // সঠিক পাথ ডিফাইন করা হলো
             const pdfUrl = `pdfs/${decryptedRealId}.pdf`;
 
-            // ফাইল সার্ভারে আছে কিনা চেক করা
             fetch(pdfUrl, { method: 'HEAD' })
                 .then(response => {
                     if (response.ok) {
-                        // ফাইল লোড করার জন্য সঠিক পাথ সেট করা
                         const pdfFrame = document.getElementById('pdfFrame');
-                        
-                        // গিটহাবের আইফ্রেম বাস্টিং রোধ করতে সরাসরি রিলেটিভ পাথ পাস করা হলো
                         pdfFrame.src = pdfUrl;
 
-                        // ১.৫ সেকেন্ড লোগো ব্লিঙ্ক করার পর মূল ফ্রেমটি একই উইন্ডোতে দেখাবে
                         setTimeout(() => {
                             document.getElementById('loadingSection').style.display = 'none';
                             document.getElementById('mainPortal').style.display = 'flex';
