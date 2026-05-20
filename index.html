@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chamber Files Portal - Verification</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
@@ -37,7 +37,6 @@
             z-index: 5;
         }
 
-        /* আপনার ছবির কালার টোনের লাইভ সিএসএস সার্কেল পালস */
         .circle-pulse {
             position: absolute;
             width: 140px;
@@ -65,7 +64,7 @@
             100% { transform: scale(1.6); opacity: 0; box-shadow: 0 0 50px 30px rgba(0, 150, 94, 0), 0 0 50px 30px rgba(46, 81, 155, 0); }
         }
 
-        /* ২. ন্যানোসেকেন্ড আগের পপ-আপ: Please wait Loading... */
+        /* ২. ইন্টারস্টেশিয়াল পপ-আপ: Please wait Loading... */
         #interstitialPopup {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -93,7 +92,6 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        /* স্ক্রিনশটের নীল রঙের স্পিনারের মতো স্টাইল */
         .blue-spinner {
             width: 42px;
             height: 42px;
@@ -115,7 +113,7 @@
             font-weight: 600;
         }
 
-        /* ৩. মূল ওয়েবসাইট ইন্টারফেস (গ্রেডিয়েন্ট হেডার ও পিডিএফ) */
+        /* ৩. মূল ওয়েবসাইট ইন্টারফেস (মোবাইল অপ্টিমাইজড) */
         #mainPortal {
             display: none;
             flex-direction: column;
@@ -126,17 +124,18 @@
 
         .top-gradient-bar {
             background: linear-gradient(to right, #00965e 0%, #007c89 40%, #2e519b 75%, #3d5ba9 100%);
-            height: 65px;
+            height: 60px;
             width: 100%;
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            padding: 0 25px;
+            padding: 0 20px;
             box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+            flex-shrink: 0;
         }
 
         .top-gradient-bar .right-logo {
-            height: 50px;
+            height: 42px;
             width: auto;
             display: flex;
             align-items: center;
@@ -148,37 +147,48 @@
             object-fit: contain;
         }
 
+        /* মোবাইল স্ক্রিনে পিডিএফ ফোর্স অটো-ভিউ কন্টেইনার */
         .pdf-viewer-container {
             flex: 1;
             width: 100%;
-            height: calc(100vh - 65px);
+            height: calc(100vh - 60px);
             background: #525659;
+            position: relative;
+            overflow: hidden;
+            -webkit-overflow-scrolling: touch;
         }
 
-        iframe {
+        iframe, object {
             width: 100%;
             height: 100%;
             border: none;
+            display: block;
         }
 
-        /* ৪. এরর মেসেজ বক্স */
+        /* ৪. এরর মেসেজ বক্স (আপনার স্ক্রিনশটের স্টাইল অনুযায়ী হুবহু ম্যাচ করা) */
         .error-box {
             background: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
+            padding: 40px 30px;
+            border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
-            max-width: 450px;
-            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 400px;
+            width: 85%;
             display: none;
-            border-top: 5px solid #c62828;
+            border-top: 6px solid #ef5350;
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10000;
+            animation: popIn 0.2s ease-out;
         }
-        .error-title { color: #c62828; font-size: 18px; font-weight: bold; margin-bottom: 10px; }
-        .error-desc { color: #555; font-size: 14px; }
+        .error-icon {
+            color: #ef5350;
+            font-size: 45px;
+            margin-bottom: 15px;
+        }
+        .error-title { color: #d32f2f; font-size: 22px; font-weight: bold; margin-bottom: 12px; }
+        .error-desc { color: #666; font-size: 15px; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -204,17 +214,18 @@
                 <img src="header-logo.png" alt="Chamber Right Logo">
             </div>
         </div>
-        <div class="pdf-viewer-container">
-            <iframe id="pdfFrame" src=""></iframe>
-        </div>
+        <div class="pdf-viewer-container" id="pdfContainer">
+            </div>
     </div>
 
     <div id="errorSection" class="error-box">
-        <div id="errorTitle" class="error-title"></div>
-        <div id="errorDesc" class="error-desc"></div>
+        <div class="error-icon">❌</div>
+        <div id="errorTitle" class="error-title">Document Not Found</div>
+        <div id="errorDesc" class="error-desc">The requested file does not exist in records.</div>
     </div>
 
 <script>
+    // গুরুত্বপূর্ণ: জেনারেটর এবং ইনডেক্স পেজের এই কি (Key) দুটি একদম সেম হতে হবে
     const SECRET_KEY = "ChamberOfficialSecretKey#2026";
 
     function getQueryParam(param) {
@@ -235,37 +246,49 @@
         const encryptedId = getQueryParam('id');
 
         if (!encryptedId) {
-            showError("❌ Error 403", "Invalid Access Token or Bad Request.");
+            showError("Document Not Found", "The requested file does not exist in records.");
             return;
         }
 
         try {
+            // ইউআরএল স্পেস ফিক্স (+)
             const formattedToken = encryptedId.replace(/ /g, '+');
             const bytes = CryptoJS.AES.decrypt(formattedToken, SECRET_KEY);
-            const decryptedRealId = bytes.toString(CryptoJS.enc.Utf8);
+            const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
 
-            if (!decryptedRealId) {
-                showError("❌ Verification Failed", "Tampered or Expired Token.");
+            if (!decryptedData) {
+                showError("Verification Failed", "Tampered or Expired Token.");
                 return;
+            }
+
+            // বড় জটিল সল্ট লিঙ্ক থেকে আসল ফাইল নেম আলাদা করার লজিক ফিক্স
+            let decryptedRealId = "";
+            if (decryptedData.includes('|')) {
+                decryptedRealId = decryptedData.split('|')[1];
+            } else {
+                decryptedRealId = decryptedData; // ওল্ড ব্যাকআপ সাপোর্ট
             }
 
             const pdfUrl = `pdfs/${decryptedRealId}.pdf`;
 
+            // ফাইলটি গিটহাবে আছে কিনা চেক করা হচ্ছে
             fetch(pdfUrl, { method: 'HEAD' })
                 .then(response => {
                     if (response.ok) {
-                        const pdfFrame = document.getElementById('pdfFrame');
-                        pdfFrame.src = pdfUrl;
+                        const container = document.getElementById('pdfContainer');
+                        
+                        // মোবাইল ব্রাউজারে বাটন ছাড়া অটো-ভিউ নিশ্চিত করতে অবজেক্ট ট্রিক প্লাগইন
+                        container.innerHTML = `
+                            <object data="${pdfUrl}" type="application/pdf">
+                                <iframe src="https://docs.google.com/gview?url=${window.location.origin}/${window.location.pathname.split('/')[1]}/${pdfUrl}&embedded=true"></iframe>
+                            </object>
+                        `;
 
-                        // ১.৮ সেকেন্ড প্রথম সার্কেল ব্লিংক অ্যানিমেশন চলার পর...
+                        // অ্যানিমেশন ট্রানজিশন টাইমিং
                         setTimeout(() => {
-                            // প্রথম স্ক্রিন চলে যাবে
                             document.getElementById('loadingSection').style.display = 'none';
-                            
-                            // ফাইল ভিউ হওয়ার জাস্ট আগের মুহূর্তে "Please wait Loading..." পপ-আপটি ওপেন হবে
                             document.getElementById('interstitialPopup').style.display = 'flex';
 
-                            // মাত্র ৭৫০ মিলি-সেকেন্ড (এক পলক) বক্সটি স্পিন করার পর ফাইনাল পোর্টাল লোড হবে
                             setTimeout(() => {
                                 document.getElementById('interstitialPopup').style.display = 'none';
                                 document.getElementById('mainPortal').style.display = 'flex';
@@ -273,15 +296,15 @@
 
                         }, 1800);
                     } else {
-                        showError("❌ Document Not Found", "The requested file does not exist in records.");
+                        showError("Document Not Found", "The requested file does not exist in records.");
                     }
                 })
                 .catch(error => {
-                    showError("❌ System Error", "Unable to complete verification portal request.");
+                    showError("System Error", "Unable to complete verification portal request.");
                 });
 
         } catch (e) {
-            showError("❌ Error", "Invalid Security Encryption Format.");
+            showError("Error", "Invalid Security Encryption Format.");
         }
     });
 </script>
