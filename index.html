@@ -64,7 +64,7 @@
             100% { transform: scale(1.6); opacity: 0; box-shadow: 0 0 50px 30px rgba(0, 150, 94, 0), 0 0 50px 30px rgba(46, 81, 155, 0); }
         }
 
-        /* ২. ইন্টারস্টেশিয়াল পপ-আপ: Please wait Loading... */
+        /* ২. ইন্টারস্টেশিয়াল পপ-আপ */
         #interstitialPopup {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -84,12 +84,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            animation: popIn 0.15s ease-out;
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0.92); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
         }
 
         .blue-spinner {
@@ -102,66 +96,94 @@
             margin-bottom: 20px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .wait-text { color: #34495e; font-size: 21px; font-weight: 600; }
 
-        .wait-text {
-            color: #34495e;
-            font-size: 21px;
-            font-weight: 600;
-        }
-
-        /* ৩. মূল ওয়েবসাইট ইন্টারফেস (মোবাইল কন্ট্রোল বার সহ) */
+        /* ৩. মূল ওয়েবসাইট ইন্টারফেস */
         #mainPortal {
             display: none;
             flex-direction: column;
             height: 100vh;
             width: 100vw;
-            background: #f4f6f9;
+            background: #525659;
         }
 
         .top-gradient-bar {
             background: linear-gradient(to right, #00965e 0%, #007c89 40%, #2e519b 75%, #3d5ba9 100%);
-            height: 60px;
+            height: 55px;
             width: 100%;
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            padding: 0 20px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+            padding: 0 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
             flex-shrink: 0;
         }
 
-        .top-gradient-bar .right-logo {
-            height: 42px;
-            width: auto;
+        .top-gradient-bar .right-logo { height: 38px; width: auto; }
+        .top-gradient-bar .right-logo img { height: 100%; width: auto; object-fit: contain; }
+
+        /* মোবাইল স্ক্রিনশট অনুযায়ী কাস্টম পিডিএফ টুলবার */
+        .custom-pdf-toolbar {
+            background-color: #f1f3f4;
+            height: 48px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px;
+            border-bottom: 1px solid #dadce0;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .toolbar-btn {
+            background: #ffffff;
+            border: 1px solid #dcdcdc;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #444;
+            cursor: pointer;
             display: flex;
             align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            min-width: 40px;
+            height: 34px;
+            transition: all 0.15s ease;
         }
 
-        .top-gradient-bar .right-logo img {
-            height: 100%;
-            width: auto;
-            object-fit: contain;
-        }
+        .toolbar-btn:active { background: #e8eaed; transform: scale(0.95); }
 
-        /* অপশন বাটন ও টুলবার সচল রাখার জন্য কন্টেইনার স্টাইল */
+        /* পিডিএফ ভিউয়ার এলাকা */
         .pdf-viewer-container {
             flex: 1;
             width: 100%;
-            height: calc(100vh - 60px);
             background: #525659;
             position: relative;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
-        /* আইফ্রেম কন্ট্রোল টুলবার এনাবল করার জন্য ন্যাটিভ স্ট্রিমিং লজিক */
-        iframe {
+        /* মোবাইল অটো-ভিউ ফ্রেন্ডলি অবজেক্ট স্টাইল */
+        #pdfIframe {
             width: 100%;
             height: 100%;
             border: none;
             display: block;
+            transform-origin: top center;
+            transition: transform 0.2s ease;
+        }
+
+        /* ডার্ক মোড ইনভার্স ইফেক্ট */
+        .dark-active #pdfIframe {
+            filter: invert(0.9) hue-rotate(180deg);
         }
 
         /* ৪. এরর মেসেজ বক্স */
@@ -179,7 +201,6 @@
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             z-index: 10000;
-            animation: popIn 0.2s ease-out;
         }
         .error-icon { color: #ef5350; font-size: 45px; margin-bottom: 15px; }
         .error-title { color: #d32f2f; font-size: 22px; font-weight: bold; margin-bottom: 12px; }
@@ -209,8 +230,18 @@
                 <img src="header-logo.png" alt="Chamber Right Logo">
             </div>
         </div>
+
+        <div class="custom-pdf-toolbar">
+            <button class="toolbar-btn" onclick="zoomIn()">➕ Zoom In</button>
+            <button class="toolbar-btn" onclick="zoomOut()">➖ Zoom Out</button>
+            <button class="toolbar-btn" onclick="rotatePDF()">🔄 Rotate</button>
+            <button class="toolbar-btn" onclick="toggleDarkMode()">🌙 Dark</button>
+            <button class="toolbar-btn" id="downloadBtn" style="background: #007c89; color: white; border-color: #007c89;">📥 Save</button>
+        </div>
+
         <div class="pdf-viewer-container" id="pdfContainer">
-            </div>
+            <iframe id="pdfIframe" src=""></iframe>
+        </div>
     </div>
 
     <div id="errorSection" class="error-box">
@@ -221,6 +252,9 @@
 
 <script>
     const SECRET_KEY = "ChamberOfficialSecretKey#2026";
+    let currentZoom = 1;
+    let currentRotation = 0;
+    let globalPdfUrl = "";
 
     function getQueryParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -234,6 +268,40 @@
         document.getElementById('errorSection').style.display = 'block';
         document.getElementById('errorTitle').innerText = title;
         document.getElementById('errorDesc').innerText = desc;
+    }
+
+    // ১. জুম ইন ফাংশন
+    function zoomIn() {
+        if (currentZoom < 3) {
+            currentZoom += 0.2;
+            applyTransforms();
+        }
+    }
+
+    // ২. জুম আউট ফাংশন
+    function zoomOut() {
+        if (currentZoom > 0.6) {
+            currentZoom -= 0.2;
+            applyTransforms();
+        }
+    }
+
+    // ৩. রোটেশন (ঘোরানো) ফাংশন
+    function rotatePDF() {
+        currentRotation = (currentRotation + 90) % 360;
+        applyTransforms();
+    }
+
+    // জুম ও রোটেশন একসাথে সিএসএস দিয়ে ট্র্যাকিং করা
+    function applyTransforms() {
+        const iframe = document.getElementById('pdfIframe');
+        iframe.style.transform = `scale(${currentZoom}) rotate(${currentRotation}deg)`;
+    }
+
+    // ৪. নাইট মোড / ডার্ক মোড টগল
+    function toggleDarkMode() {
+        const container = document.getElementById('pdfContainer');
+        container.classList.toggle('dark-active');
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -261,17 +329,30 @@
                 decryptedRealId = decryptedData;
             }
 
-            const pdfUrl = `pdfs/${decryptedRealId}.pdf`;
+            // লোকাল ডিরেক্ট পিডিএফ পাথ
+            globalPdfUrl = `pdfs/${decryptedRealId}.pdf`;
 
-            fetch(pdfUrl, { method: 'HEAD' })
+            fetch(globalPdfUrl, { method: 'HEAD' })
                 .then(response => {
                     if (response.ok) {
-                        const container = document.getElementById('pdfContainer');
+                        // মোবাইলে সরাসরি ফাইল ওপেন করতে গুগল ড্রাইভ ডক ভিউয়ার স্ট্রিম লিংক ব্যবহার করা হলো
+                        const encodedAbsoluteUrl = encodeURIComponent(window.location.origin + window.location.pathname.replace('index.html', '') + globalPdfUrl);
+                        const viewerUrl = `https://docs.google.com/gview?url=${encodedAbsoluteUrl}&embedded=true`;
                         
-                        // ডিরেক্ট ন্যাটিভ ফাইল পাথ রেন্ডার (যা ব্রাউজারের ফুল অপশন বার লোড করতে বাধ্য করবে)
-                        // শেষে #toolbar=1&navpanes=1 দেওয়া হয়েছে যাতে কোনো অপশন হাইড না হয়
-                        container.innerHTML = `<iframe src="${pdfUrl}#toolbar=1&navpanes=1" role="document"></iframe>`;
+                        const iframe = document.getElementById('pdfIframe');
+                        iframe.src = viewerUrl;
 
+                        // অফিশিয়াল ডাউনলোড বাটনে ডিরেক্ট লিংক ম্যাপ করে দেওয়া হলো
+                        document.getElementById('downloadBtn').onclick = function() {
+                            const link = document.createElement('a');
+                            link.href = globalPdfUrl;
+                            link.download = `${decryptedRealId}.pdf`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        };
+
+                        // লোডিং ফেইড আউট সিকোয়েন্স
                         setTimeout(() => {
                             document.getElementById('loadingSection').style.display = 'none';
                             document.getElementById('interstitialPopup').style.display = 'flex';
