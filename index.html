@@ -81,7 +81,7 @@
             }
 
             // ২. আসল আইডি দিয়ে পিডিএফ ফোল্ডার থেকে ফাইল খোঁজা
-            const pdfUrl = `../pdfs/${decryptedRealId}.pdf`;
+            const pdfUrl = `pdfs/${decryptedRealId}.pdf`;
 
             fetch(pdfUrl, { method: 'HEAD' })
                 .then(response => {
