@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chamber Files Portal - Verification</title>
+    <!-- CryptoJS লাইব্রেরি যোগ করা হলো সিকিউরিটি কোড ডিক্রিপ্ট করার জন্য -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f4f6f9; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { background: #ffffff; max-width: 900px; width: 100%; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); overflow: hidden; text-align: center; }
+        .header { padding: 25px; background: #004d40; color: white; } /* চেম্বার অব কমার্স থিম কালার */
+        .header h1 { font-size: 22px; letter-spacing: 0.5px; }
+        .header p { font-size: 13px; color: #eceff1; margin-top: 5px; }
+        .content { padding: 30px 20px; min-height: 500px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .status-message { font-size: 16px; font-weight: 600; margin-bottom: 20px; padding: 10px 20px; border-radius: 4px; }
+        .loading { color: #004d40; background: #e0f2f1; }
+        .error { color: #c62828; background: #ffebee; }
+        .success { color: #2e7d32; background: #e8f5e9; }
+        .pdf-container { width: 100%; height: 600px; border: 1px solid #d1d5db; border-radius: 4px; display: none; }
+        iframe { width: 100%; height: 100%; border: none; }
+        .footer { padding: 15px; background: #f8f9fa; font-size: 11px; color: #757575; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>الـغـرفـة الـتـجـاريـة - بـوابـة الـمـلـفـات</h1>
+        <p>Chamber of Commerce - Official Files Portal</p>
+    </div>
+
+    <div class="content">
+        <div id="status" class="status-message loading">🔄 Securing Connection & Verifying Document Token...</div>
+        
+        <div id="pdfViewer" class="pdf-container">
+            <iframe id="pdfFrame" src=""></iframe>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 Chamber of Commerce. All rights reserved. Secure Verification Portal.
+    </div>
+</div>
+
+<script>
+    // সিক্রেট পাসওয়ার্ড (যা দিয়ে আইডি লক ও আনলক হবে)
+    // এটি কাউকে জানাবেন না, এটি শুধু কোডের ভেতরেই থাকবে
+    const SECRET_KEY = "ChamberOfficialSecretKey#2026";
+
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const encryptedId = getQueryParam('id');
+        const statusElement = document.getElementById('status');
+        const pdfViewer = document.getElementById('pdfViewer');
+        const pdfFrame = document.getElementById('pdfFrame');
+
+        if (!encryptedId) {
+            statusElement.innerHTML = "❌ Error 403: Invalid Access Token or Bad Request.";
+            statusElement.className = "status-message error";
+            return;
+        }
+
+        try {
+            // ১. লিংকের সেই জটিল সিকিউরিটি কোডটিকে ডিক্রিপ্ট (আনলক) করা
+            // এখানে ইউআরএল ফ্রেন্ডলি ক্যারেক্টার স্পেস (+) ঠিক করে নেওয়া হচ্ছে
+            const formattedToken = encryptedId.replace(/ /g, '+');
+            const bytes = CryptoJS.AES.decrypt(formattedToken, SECRET_KEY);
+            const decryptedRealId = bytes.toString(CryptoJS.enc.Utf8);
+
+            // যদি ডিক্রিপ্ট করার পর আসল আইডি (যেমন 001) না পাওয়া যায়
+            if (!decryptedRealId) {
+                statusElement.innerHTML = "❌ Verification Failed: Tampered or Expired Token.";
+                statusElement.className = "status-message error";
+                return;
+            }
+
+            // ২. আসল আইডি দিয়ে পিডিএফ ফোল্ডার থেকে ফাইল খোঁজা
+            const pdfUrl = `../pdfs/${decryptedRealId}.pdf`;
+
+            fetch(pdfUrl, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        statusElement.innerHTML = "✅ Document Successfully Verified by Chamber Portal.";
+                        statusElement.className = "status-message success";
+                        
+                        pdfFrame.src = pdfUrl;
+                        pdfViewer.style.display = "block";
+                    } else {
+                        statusElement.innerHTML = "❌ Document Not Found: The requested file does not exist in records.";
+                        statusElement.className = "status-message error";
+                    }
+                })
+                .catch(error => {
+                    statusElement.innerHTML = "❌ System Error: Unable to complete verification.";
+                    statusElement.className = "status-message error";
+                });
+
+        } catch (e) {
+            statusElement.innerHTML = "❌ Error: Invalid Security Encryption Format.";
+            statusElement.className = "status-message error";
+        }
+    });
+</script>
+
+</body>
+</html>
