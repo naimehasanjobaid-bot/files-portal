@@ -6,52 +6,72 @@
     <title>Chamber Files Portal - Verification</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f4f6f9; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { background: #ffffff; max-width: 600px; width: 100%; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); overflow: hidden; text-align: center; border-top: 5px solid #004d40; }
-        .header { padding: 25px; background: #ffffff; border-bottom: 1px solid #eee; }
-        .header h1 { font-size: 22px; color: #004d40; }
-        .header p { font-size: 13px; color: #666; margin-top: 5px; }
-        .content { padding: 40px 20px; min-height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .status-message { font-size: 16px; font-weight: 600; margin-bottom: 25px; padding: 12px 20px; border-radius: 4px; width: 100%; }
-        .loading { color: #004d40; background: #e0f2f1; }
-        .error { color: #c62828; background: #ffebee; }
-        .success { color: #2e7d32; background: #e8f5e9; }
-        
-        .action-btn { 
-            display: none; 
-            background: #004d40; 
-            color: white; 
-            text-decoration: none; 
-            padding: 14px 30px; 
-            border-radius: 4px; 
-            font-weight: bold; 
-            box-shadow: 0 2px 8px rgba(0,77,64,0.3);
-            transition: 0.2s;
-            font-size: 16px;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            background-color: #1a1a1a; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            overflow: hidden;
         }
-        .action-btn:hover { background: #00332c; }
-        .footer { padding: 15px; background: #f8f9fa; font-size: 11px; color: #757575; border-top: 1px solid #eee; }
+        
+        /* ব্লিঙ্কিং লোগো কন্টেইনার */
+        .loading-container { 
+            text-align: center; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        @keyframes blink { 
+            0% { opacity: 0.2; transform: scale(0.98); } 
+            50% { opacity: 1; transform: scale(1); } 
+            100% { opacity: 0.2; transform: scale(0.98); } 
+        }
+        
+        .loading-container img { 
+            width: 180px; 
+            height: 180px;
+            animation: blink 1.5s infinite ease-in-out; 
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        /* এরর মেসেজ দেখানোর স্টাইল */
+        .error-box {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+            max-width: 450px;
+            width: 100%;
+            display: none;
+            font-family: 'Segoe UI', sans-serif;
+            border-top: 5px solid #c62828;
+        }
+        .error-title { color: #c62828; font-size: 18px; font-weight: bold; margin-bottom: 10px; }
+        .error-desc { color: #555; font-size: 14px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>الـغـرفـة الـتـجـاريـة - بـوابـة الـمـلـفـات</h1>
-        <p>Chamber of Commerce - Official Files Portal</p>
+    <div id="loadingSection" class="loading-container">
+        <img src="logo.png" alt="Chamber Logo">
+        <div class="loading-text">جاري تحميل المستند الرسمي... (Official Document Loading...)</div>
     </div>
 
-    <div class="content">
-        <div id="status" class="status-message loading">🔄 Securing Connection & Verifying Document Token...</div>
-        
-        <a id="viewBtn" href="#" class="action-btn" target="_blank">📄 View Official Document (PDF)</a>
+    <div id="errorSection" class="error-box">
+        <div id="errorTitle" class="error-title"></div>
+        <div id="errorDesc" class="error-desc"></div>
     </div>
-
-    <div class="footer">
-        &copy; 2026 Chamber of Commerce. All rights reserved. Secure Verification Portal.
-    </div>
-</div>
 
 <script>
     const SECRET_KEY = "ChamberOfficialSecretKey#2026";
@@ -61,14 +81,18 @@
         return urlParams.get(param);
     }
 
+    function showError(title, desc) {
+        document.getElementById('loadingSection').style.display = 'none';
+        document.getElementById('errorSection').style.display = 'block';
+        document.getElementById('errorTitle').innerText = title;
+        document.getElementById('errorDesc').innerText = desc;
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
         const encryptedId = getQueryParam('id');
-        const statusElement = document.getElementById('status');
-        const viewBtn = document.getElementById('viewBtn');
 
         if (!encryptedId) {
-            statusElement.innerHTML = "❌ Error 403: Invalid Access Token or Bad Request.";
-            statusElement.className = "status-message error";
+            showError("❌ Error 403", "Invalid Access Token or Bad Request.");
             return;
         }
 
@@ -78,36 +102,31 @@
             const decryptedRealId = bytes.toString(CryptoJS.enc.Utf8);
 
             if (!decryptedRealId) {
-                statusElement.innerHTML = "❌ Verification Failed: Tampered or Expired Token.";
-                statusElement.className = "status-message error";
+                showError("❌ Verification Failed", "Tampered or Expired Token.");
                 return;
             }
 
-            // যেহেতু pdfs ফোল্ডারটি files-portal এর ভেতরেই আছে
+            // pdfs ফোল্ডারটি files-portal এর ভেতরেই আছে
             const pdfUrl = `pdfs/${decryptedRealId}.pdf`;
 
+            // ফাইলটি সার্ভারে আছে কিনা চেক করা
             fetch(pdfUrl, { method: 'HEAD' })
                 .then(response => {
                     if (response.ok) {
-                        statusElement.innerHTML = "✅ Document Successfully Verified by Chamber Portal.";
-                        statusElement.className = "status-message success";
-                        
-                        // বাটন সেটআপ এবং সরাসরি ব্রাউজারের অফিসিয়াল ভিউয়ারে ওপেন করার লিংক
-                        viewBtn.href = pdfUrl;
-                        viewBtn.style.display = "inline-block";
+                        // ফাইল পাওয়া গেছে! এবার ব্লিঙ্কিং শেষ করে সরাসরি পিডিএফ ওপেন হবে
+                        setTimeout(() => {
+                            window.location.replace(pdfUrl);
+                        }, 1500); // ১.৫ সেকেন্ড লোগো ব্লিঙ্ক করার পর অটোমেটিক রিডাইরেক্ট হবে
                     } else {
-                        statusElement.innerHTML = "❌ Document Not Found: The requested file does not exist in records.";
-                        statusElement.className = "status-message error";
+                        showError("❌ Document Not Found", "The requested file does not exist in records.");
                     }
                 })
                 .catch(error => {
-                    statusElement.innerHTML = "❌ System Error: Unable to complete verification.";
-                    statusElement.className = "status-message error";
+                    showError("❌ System Error", "Unable to complete verification portal request.");
                 });
 
         } catch (e) {
-            statusElement.innerHTML = "❌ Error: Invalid Security Encryption Format.";
-            statusElement.className = "status-message error";
+            showError("❌ Error", "Invalid Security Encryption Format.");
         }
     });
 </script>
