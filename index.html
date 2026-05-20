@@ -9,7 +9,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; width: 100%; background-color: #1a1a1a; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* ১. ব্লিঙ্কিং লোগো স্ক্রিন (শুরুতে এটি দেখাবে) */
+        /* ১. ব্লিঙ্কিং লোগো এবং সার্কেল অ্যানিমেশন সেকশন */
         #loadingSection {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -21,21 +21,76 @@
             z-index: 9999;
         }
         
-        @keyframes blink { 
-            0% { opacity: 0.2; transform: scale(0.98); } 
-            50% { opacity: 1; transform: scale(1); } 
-            100% { opacity: 0.2; transform: scale(0.98); } 
+        /* লোগো ও সার্কেলের মেইন কন্টেইনার */
+        .logo-wrapper {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        /* লোগোর ছবি (এটি একদম ফিক্সড ও ক্লিয়ার থাকবে) */
+        .logo-wrapper img {
+            width: 150px;
+            height: 150px;
+            object-fit: contain;
+            z-index: 5;
+        }
+
+        /* লোগোর ভেতর থেকে কালার সার্কেল ব্লিঙ্ক করার ম্যাজিক সিএসএস */
+        .circle-pulse {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            /* আপনার ছবির হুবহু সবুজ ও নীল কম্বিনেশনের গ্রেডিয়েন্ট */
+            background: radial-gradient(circle, rgba(0,150,94,0.8) 0%, rgba(46,81,155,0.8) 100%);
+            z-index: 1;
+            animation: rippleBlink 2s infinite ease-in-out;
+        }
+
+        /* দ্বিতীয় আরেকটি সার্কেল একটু দেরিতে ব্লিঙ্ক করার জন্য (স্মুথ ইফেক্ট) */
+        .circle-pulse-delayed {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,150,94,0.6) 0%, rgba(46,81,155,0.6) 100%);
+            z-index: 1;
+            animation: rippleBlink 2s infinite ease-in-out;
+            animation-delay: 1s;
         }
         
-        #loadingSection img { 
-            width: 180px; height: 180px;
-            animation: blink 1.5s infinite ease-in-out; 
-            margin-bottom: 20px;
+        /* সার্কেল ছড়িয়ে পড়ার অ্যানিমেশন কি-ফ্রেম */
+        @keyframes rippleBlink {
+            0% {
+                transform: scale(0.9);
+                opacity: 0.3;
+                box-shadow: 0 0 0 0 rgba(0, 150, 94, 0.4), 0 0 0 0 rgba(46, 81, 155, 0.4);
+            }
+            50% {
+                opacity: 0.9;
+                box-shadow: 0 0 30px 15px rgba(0, 150, 94, 0.6), 0 0 30px 15px rgba(46, 81, 155, 0.6);
+            }
+            100% {
+                transform: scale(1.6);
+                opacity: 0;
+                box-shadow: 0 0 50px 30px rgba(0, 150, 94, 0), 0 0 50px 30px rgba(46, 81, 155, 0);
+            }
         }
 
-        .loading-text { color: #ffffff; font-size: 16px; text-align: center; }
+        .loading-text { 
+            color: #ffffff; 
+            font-size: 16px; 
+            text-align: center; 
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
 
-        /* ২. মূল ওয়েবসাইট ইন্টারফেস (পিডিএফ দেখানোর মূল ফ্রেম) */
+        /* ২. মূল ওয়েবসাইট ইন্টারফেস (গ্রেডিয়েন্ট বার ও পিডিএফ) */
         #mainPortal {
             display: none;
             flex-direction: column;
@@ -44,21 +99,20 @@
             background: #f4f6f9;
         }
 
-        /* আপনার ছবি অনুযায়ী তৈরি করা পিওর সিএসএস গ্রেডিয়েন্ট টপ বার */
+        /* পিওর সিএসএস গ্রেডিয়েন্ট টপ বার */
         .top-gradient-bar {
             background: linear-gradient(to right, #00965e 0%, #007c89 40%, #2e519b 75%, #3d5ba9 100%);
             height: 65px;
             width: 100%;
             display: flex;
-            justify-content: flex-end; /* সব কনটেন্ট ডান পাশে নিয়ে যাবে */
+            justify-content: flex-end;
             align-items: center;
             padding: 0 25px;
             box-shadow: 0 3px 12px rgba(0,0,0,0.25);
         }
 
-        /* ডান পাশের লোগো এরিয়া */
         .top-gradient-bar .right-logo {
-            height: 50px; /* বারের ভেতর লোগোটি যাতে পারফেক্ট দেখায় */
+            height: 50px;
             width: auto;
             display: flex;
             align-items: center;
@@ -107,8 +161,12 @@
 <body>
 
     <div id="loadingSection">
-        <img src="logo.png" alt="Chamber Logo">
-        <div class="loading-text">جاري تحميل المستند الرسمي... (Official Document Loading...)</div>
+        <div class="logo-wrapper">
+            <div class="circle-pulse"></div>
+            <div class="circle-pulse-delayed"></div>
+            <img src="logo.png" alt="Chamber Logo">
+        </div>
+        <div class="loading-text">جاري تحميل المستند الرسمي... <br>(Official Document Loading...)</div>
     </div>
 
     <div id="mainPortal">
@@ -169,10 +227,11 @@
                         const pdfFrame = document.getElementById('pdfFrame');
                         pdfFrame.src = pdfUrl;
 
+                        // ২ সেকেন্ড চমৎকার পালস অ্যানিমেশন দেখানোর পর মূল পিডিএফ পেজ ওপেন হবে
                         setTimeout(() => {
                             document.getElementById('loadingSection').style.display = 'none';
                             document.getElementById('mainPortal').style.display = 'flex';
-                        }, 1500);
+                        }, 2000);
                     } else {
                         showError("❌ Document Not Found", "The requested file does not exist in records.");
                     }
