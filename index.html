@@ -123,72 +123,85 @@
         .top-gradient-bar .right-logo { height: 30px; width: auto; }
         .top-gradient-bar .right-logo img { height: 100%; width: auto; object-fit: contain; }
 
-        /* 👑 মডিফাইড কাস্টম পিডিএফ টুলবার (ডেস্কটপে এক লাইনে, মোবাইলে ২ লাইনে আসবে) */
+        /* 👑 কাস্টম পিডিএফ টুলবার (১০০% ইমেজের সাথে মিল রেখে বোর্ডার এবং শ্যাডো) */
         .custom-pdf-toolbar {
-            background-color: #f1f3f4;
+            background-color: #f8fafc;
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap; /* মোবাইলে ভেঙে নিচে নামার মূল লজিক */
-            padding: 5px 10px;
-            border-bottom: 1px solid #dadce0;
+            flex-wrap: wrap;
+            padding: 6px 12px;
+            border-bottom: 1px solid #e2e8f0;
             flex-shrink: 0;
             z-index: 100;
             gap: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }
 
-        /* বাম এবং ডান পাশের গ্রুপিং বক্স */
+        /* বাম এবং ডান পাশের বাটন গ্রুপিং কন্টেইনার */
         .toolbar-left, .toolbar-right {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
-        /* কমন বাটন স্টাইলিং (সাদা বক্স) */
+        /* বাটন স্টাইলিং (ইমেজের মতো হালকা গ্রে বর্ডার এবং রাউন্ডেড শেপ) */
         .toolbar-btn {
             background: #ffffff;
-            border: 1px solid #dcdcdc;
+            border: 1px solid #e2e8f0;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.15s ease;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            height: 32px;
         }
 
         /* চারকোণা বাটন (Shape ১) */
         .shape-rect {
-            width: 34px;
-            height: 34px;
-            border-radius: 6px;
+            width: 32px;
+            border-radius: 4px;
         }
 
-        /* গোল বাটন (Shape ২) */
+        /* গোল বাটন (ইমেজের সাথে মিল রেখে সামান্য রাউন্ডেড কোণা) */
         .shape-circle {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
+            width: 32px;
+            border-radius: 4px;
         }
 
-        /* বড় চারকোণা পেজ কাউন্টার বাটন */
+        /* পেজ কাউন্টার বক্স */
         .shape-big-rect {
-            padding: 0 12px;
-            height: 34px;
-            border-radius: 6px;
-            font-size: 14px;
-            color: #1c1b1f;
-            font-weight: 500;
+            padding: 0 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #0f172a;
+            font-weight: 600;
         }
 
-        /* কালো আইকন স্টাইলিং */
+        /* জুম সিলেক্ট ড্রপডাউন বক্স */
+        .zoom-dropdown {
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            background: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* আইকন কালার এবং সাইজ (ইমেজের মতো ডার্ক ব্লু/ব্ল্যাক শেড) */
         .toolbar-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: #1c1b1f;
+            width: 16px;
+            height: 16px;
+            fill: #334155;
         }
 
-        .toolbar-btn:active { background: #e8eaed; transform: scale(0.92); }
+        .toolbar-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+        .toolbar-btn:active { background: #e2e8f0; transform: scale(0.95); }
 
         /* পিডিএফ ভিউয়ার এলাকা */
         .pdf-viewer-container {
@@ -234,19 +247,21 @@
         .error-title { color: #d32f2f; font-size: 20px; font-weight: bold; margin-bottom: 10px; }
         .error-desc { color: #666; font-size: 14px; line-height: 1.5; }
 
-        /* 📱 মোবাইলের জন্য রেসপন্সিভ মিডিয়া কোয়েরি */
-        @media screen and (max-width: 580px) {
+        /* 📱 মোবাইলের জন্য রেসপন্সিভ কারেকশন (বাম পাশ থেকে ২ লাইন শুরু করার মূল লজিক) */
+        @media screen and (max-width: 640px) {
             .custom-pdf-toolbar {
-                justify-content: center;
-                padding: 6px;
+                justify-content: flex-start; /* মেনু বক্সগুলো বাম দিক থেকে শুরু হবে */
+                padding: 6px 10px;
+                gap: 10px;
             }
             .toolbar-left {
                 width: 100%;
-                justify-content: center; /* বামপাশেরটুকু উপরে মাঝে থাকবে */
+                justify-content: flex-start; /* ১ম লাইন বাম পাশ থেকে থাকবে */
             }
             .toolbar-right {
                 width: 100%;
-                justify-content: center; /* ডানপাশেরটুকু নিচে মাঝে থাকবে */
+                justify-content: flex-start; /* ২য় লাইনও ভেঙে বাম পাশ থেকেই শুরু হবে */
+                padding-top: 2px;
             }
         }
     </style>
@@ -279,47 +294,53 @@
             
             <div class="toolbar-left">
                 <button class="toolbar-btn shape-rect" title="Sidebar">
-                    <svg viewBox="0 0 24 24"><path d="M4 18h16v-2H4v2zm0-5h16v-2H4v2zm0-7v2h16V6H4z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 16H5V5h7v14zm7 0h-5V5h5v14z"/></svg>
                 </button>
                 
                 <button class="toolbar-btn shape-rect" title="Previous Page">
-                    <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
                 </button>
 
-                <div class="toolbar-btn shape-big-rect" title="Page Count">1/1</div>
+                <div class="toolbar-btn shape-big-rect" title="Page Count">1/01</div>
 
                 <button class="toolbar-btn shape-rect" title="Next Page">
-                    <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
                 </button>
                 
                 <button class="toolbar-btn shape-circle" id="downloadBtn" title="Download">
-                    <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm14-9h-4V3H9v8H5l7 7 7-7z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
                 </button>
                 
                 <button class="toolbar-btn shape-circle" onclick="toggleDarkMode()" title="Dark Mode">
-                    <svg viewBox="0 0 24 24"><path d="M10 2c-1.82 0-3.53.5-5 1.35C7.99 5.08 10 8.3 10 12s-2.01 6.92-5 8.65C6.47 21.5 8.18 22 10 22c5.52 0 10-4.48 10-10S15.52 2 10 2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
                 </button>
             </div>
 
             <div class="toolbar-right">
                 <button class="toolbar-btn shape-circle" onclick="zoomOut()" title="Zoom Out">
-                    <svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM7 9h5v1H7z"/></svg>
                 </button>
                 
+                <select class="zoom-dropdown" id="zoomSelect">
+                    <option value="1">100%</option>
+                    <option value="1.5" selected>150%</option>
+                    <option value="2">200%</option>
+                </select>
+                
                 <button class="toolbar-btn shape-circle" onclick="zoomIn()" title="Zoom In">
-                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zm.5-7H9v2H7v1h2v2h1v-2h2V9h-2z"/></svg>
                 </button>
                 
                 <button class="toolbar-btn shape-circle" title="Fit to Page">
-                    <svg viewBox="0 0 24 24"><path d="M7 19h10v2H7v-2zm10-14H7V3h10v2zm0 2h-2v10h2V7zm-8 10h-2V7h2v10z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
                 </button>
 
                 <button class="toolbar-btn shape-circle" onclick="rotatePDF(false)" title="Rotate Left">
-                    <svg viewBox="0 0 24 24"><path d="M7.11 8.53L5.7 7.11C4.8 8.27 4.24 9.61 4.07 11h2.02c.16-.84.52-1.61 1.02-2.47zm1.01-1.02c.86-.5 1.63-.86 2.47-1.02V4.47c-1.39.17-2.73.73-3.89 1.63l1.42 1.41zM13 4.07v2.02c.84.16 1.61.52 2.47 1.02l1.41-1.42C15.73 4.8 14.39 4.24 13 4.07zm6.93 6.93h2.02c-.17-1.39-.73-2.73-1.63-3.89l-1.41 1.42c.5.86.86 1.63 1.02 2.47z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L3.3 8.3V15h6.7l-2.7-2.7c1.45-1.14 3.29-1.8 5.2-1.8 4.14 0 7.5 3.01 7.5 6.72 0 1.94-.78 3.69-2.05 4.94l1.42 1.42C21.1 21.62 22 19.41 22 17c0-4.97-4.25-9-9.5-9z"/></svg>
                 </button>
 
                 <button class="toolbar-btn shape-circle" onclick="rotatePDF(true)" title="Rotate Right">
-                    <svg viewBox="0 0 24 24"><path d="M15.55 13c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.37-.66-.11-1.48-.87-1.48H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 15.37 5.48 17 7 17h12v-2H7l1.1-2h7.45zM6.16 6h12.15l-2.76 5H8.53L6.16 6zM7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M11.5 9c2.65 0 5.05.99 6.9 2.6l2.3-2.3V16h-6.7l2.7-2.7c-1.45-1.14-3.29-1.8-5.2-1.8-4.14 0-7.5 3.01-7.5 6.72 0 1.94.78 3.69 2.05 4.94l-1.42 1.42C2.9 22.62 2 20.41 2 18c0-4.97 4.25-9 9.5-9z"/></svg>
                 </button>
             </div>
 
@@ -338,7 +359,7 @@
 
 <script>
     const SECRET_KEY = "ChamberOfficialSecretKey#2026";
-    let currentZoom = 1;
+    let currentZoom = 1.5; // ইমেজের মত ডিফল্ট জুম ১৫০% সেট করা হলো
     let currentRotation = 0;
     let globalPdfUrl = "";
 
@@ -356,9 +377,16 @@
         document.getElementById('errorDesc').innerText = desc;
     }
 
+    // ড্রপডাউন সিলেক্ট পরিবর্তন করলে জুম চেইঞ্জ হওয়া
+    document.getElementById('zoomSelect').addEventListener('change', function(e) {
+        currentZoom = parseFloat(e.target.value);
+        applyTransforms();
+    });
+
     function zoomIn() {
         if (currentZoom < 2.6) {
             currentZoom += 0.2;
+            document.getElementById('zoomSelect').value = currentZoom.toFixed(1);
             applyTransforms();
         }
     }
@@ -366,6 +394,7 @@
     function zoomOut() {
         if (currentZoom > 0.6) {
             currentZoom -= 0.2;
+            document.getElementById('zoomSelect').value = currentZoom.toFixed(1);
             applyTransforms();
         }
     }
@@ -437,6 +466,7 @@
                             setTimeout(() => {
                                 document.getElementById('interstitialPopup').style.display = 'none';
                                 document.getElementById('mainPortal').style.display = 'flex';
+                                applyTransforms();
                             }, 750); 
 
                         }, 1800);
